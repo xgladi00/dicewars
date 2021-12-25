@@ -52,6 +52,9 @@ class AI:
             return self.post_attack(board, nb_transfers_this_turn)
 
     def pre_attack(self, board, nb_transfers_this_turn):
+        """
+        Pre attack phase. Moves dice to vulnerable areas
+        """
         command = self.get_border_reinforcement_command(board)
 
         if nb_transfers_this_turn < self.max_transfers / 2 and command is not None:
@@ -60,6 +63,9 @@ class AI:
             self.stage = "attack"
 
     def attack(self, board):
+        """
+        Attack phase. Performs attack according to constants
+        """
         attacks = self.get_attacks(board)
         if len(attacks) != 0:
             (source, target, prob) = attacks[0]
@@ -68,6 +74,9 @@ class AI:
             self.stage = "post-attack"
 
     def post_attack(self, board, nb_transfers_this_turn):
+        """
+        Post attack phase. Moves dice to vulnerable areas
+        """
         command = self.get_border_reinforcement_command(board)
         if nb_transfers_this_turn < self.max_transfers and command is not None:
             return command
@@ -76,6 +85,9 @@ class AI:
             return EndTurnCommand()
 
     def get_border_reinforcement_command(self, board: Board):
+        """
+        Gets command for bored reinforcement
+        """
         paths = self.get_ok_to_vulnerable_areas_paths(board, self.player_name)
         if paths is None or len(paths) == 0:
             return None
@@ -97,6 +109,9 @@ class AI:
         # return commands
 
     def get_attacks(self, board: Board):
+        """
+        Gets viable attacks
+        """
 
         attacks = possible_attacks(board, self.player_name)
         viable_attacks = []
@@ -109,6 +124,9 @@ class AI:
         return viable_attacks
 
     def get_path_to_area(self, board: Board, area_from: Area, area_to: Area, searched=None) -> list[Area]:
+        """
+        Recursive function for getting path to specified area
+        """
         if searched is None:
             searched = []
 
@@ -137,6 +155,9 @@ class AI:
             return list(sorted(paths, key=len))[0]
 
     def get_ok_to_vulnerable_areas_paths(self, board: Board, player: int):
+        """
+        Get all paths from areas with hold probability of 1 to areas with holding probability lower than the constant
+        """
         (vulnerable, ok) = self.get_vulnerable_areas(board, player)
         ok = list(filter(lambda area: area.dice > self.AREA_OK_TRANSFER_THRESHOLD, ok))
         if len(ok) == 0:
@@ -155,6 +176,9 @@ class AI:
 
 
     def get_vulnerable_areas(self, board: Board, player: int) -> (list[Area], list[Area]):
+        """
+        Gets areas with holding probability lower than  value specified in constant
+        """
         player_area = board.get_player_areas(player)
         vulnerable = []
         area_ok = []
