@@ -6,6 +6,7 @@ import numpy as np
 import socket
 import sys
 
+from .board import Board
 from .player import Player
 
 from .summary import GameSummary
@@ -62,7 +63,7 @@ class Game:
 
         self.create_socket()
 
-        self.board = board
+        self.board: Board = board
         self.initialize_players()
 
         self.connect_clients()

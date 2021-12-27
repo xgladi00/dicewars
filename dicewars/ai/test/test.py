@@ -14,11 +14,12 @@ class AI:
         self.AREA_VULNERABLE_THRESHOLD = 0.6
         self.AREA_OK_THRESHOLD = 1
         self.AREA_OK_TRANSFER_THRESHOLD = 4
+        self.ATTACK_THRESHOLD = 0.4
 
         self.max_transfers = max_transfers
         self.player_name = player_name
         self.logger = logging.getLogger('SuperUltraCleverAI')
-        self.logger.error(player_name)
+        self.logger.info(player_name)
 
         self.stage = "pre-attack"
 
@@ -68,7 +69,8 @@ class AI:
         """
         attacks = self.get_attacks(board)
         if len(attacks) != 0:
-            (source, target, prob) = attacks[0]
+            attacks.sort(key=lambda attack: attack[2], reverse=True)
+            (source, target, prob, holding_prob) = attacks[0]
             return BattleCommand(source.name, target.name)
         else:
             self.stage = "post-attack"
@@ -116,19 +118,23 @@ class AI:
         attacks = possible_attacks(board, self.player_name)
         viable_attacks = []
         for source, target in attacks:
-            if probability_of_successful_attack(board, source.name, target.name) > self.ATTACK_PROB_THRESHOLD:
-                holding_prob = probability_of_holding_area(board, target.name, source.dice - 1, self.player_name)
-                if holding_prob > self.HOLD_PROB_THRESHOLD:
-                    viable_attacks.append((source, target, holding_prob))
+            attack_prob = probability_of_successful_attack(board, source.name, target.name)
+            holding_prob = probability_of_holding_area(board, target.name, source.dice - 1, self.player_name)
+            prob = attack_prob * holding_prob
+            if prob > self.ATTACK_THRESHOLD or source.dice >= 8:
+                viable_attacks.append((source, target, prob, holding_prob))
 
         return viable_attacks
 
-    def get_path_to_area(self, board: Board, area_from: Area, area_to: Area, searched=None) -> list[Area]:
+    def get_path_to_area(self, board: Board, area_from: Area, area_to: Area, searched=None, do_not_cross=None) -> list[Area]:
         """
         Recursive function for getting path to specified area
         """
         if searched is None:
             searched = []
+
+        if do_not_cross is None:
+            do_not_cross = []
 
         paths = []
 
@@ -140,6 +146,8 @@ class AI:
             if x == area_to.name:
                 return [area_from, area_to]
             else:
+                if x in do_not_cross:
+                    continue
                 searched.append(x)
                 found_path = self.get_path_to_area(board, area_x, area_to, searched)
 
@@ -160,20 +168,20 @@ class AI:
         """
         (vulnerable, ok) = self.get_vulnerable_areas(board, player)
         ok = list(filter(lambda area: area.dice > self.AREA_OK_TRANSFER_THRESHOLD, ok))
+        border = [area.name for area in board.get_player_border(self.player_name)]
         if len(ok) == 0:
             return []
 
         paths = []
         for area_ok in ok:
             for area_vulnerable in vulnerable:
-                path = self.get_path_to_area(board, area_ok, area_vulnerable)
+                path = self.get_path_to_area(board, area_ok, area_vulnerable, border)
                 if path is None:
                     continue
                 paths.append(path)
 
         paths.sort(key=len)
         return paths
-
 
     def get_vulnerable_areas(self, board: Board, player: int) -> (list[Area], list[Area]):
         """

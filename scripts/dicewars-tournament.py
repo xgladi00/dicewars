@@ -47,6 +47,7 @@ PLAYING_AIs = [
     'dt.stei',
     # 'dt.wpm_d',
     # 'dt.wpm_s',
+    'test.test'
     'dt.wpm_c',
     'kb.sdc_post_at',
     'kb.sdc_post_dt',

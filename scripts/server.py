@@ -7,6 +7,7 @@ import random
 
 from itertools import cycle
 
+from dicewars.ai.test.recording_server import ServerRecord
 from dicewars.server.board import Board
 from dicewars.server.generator import BoardGenerator
 from dicewars.server.game import Game
@@ -168,7 +169,7 @@ def main():
     assign_dice(board_config, board, args.number_of_players, area_ownership)
 
     random.seed(args.fixed)
-    game = Game(board, area_ownership, args.number_of_players, game_config, args.address, args.port, args.order)
+    game = ServerRecord(board, area_ownership, args.number_of_players, game_config, args.address, args.port, args.order)
     game.run()
 
 
