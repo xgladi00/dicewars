@@ -1,11 +1,14 @@
 import numpy as np
+
+import dicewars
 import dicewars.ai.utils as utils
+from dicewars.ai.test.recording_server import ServerRecord
 from dicewars.server.area import Area
 
 from dicewars.server.board import Board
 
 
-def get_battle_features(battle, next_turn_board: Board):
+def extract_features_from_battle(battle, next_turn_board: Board):
     board_before: Board = battle["board_before"]
     board_after: Board = battle["board_after"]
     battle_stat = battle["battle"]
@@ -32,13 +35,12 @@ def get_battle_features(battle, next_turn_board: Board):
     hold_probability = probability_of_holding_area_server(board_before, atk, atk_area.dice - 1, atk_area.owner_name)
     deff_dice_normalized = deff_dice / 8
     atk_dice_normalized = atk_dice / 8
-    deff_neighbour_dice_normalized = deff_neighbour_dice / (deff_neighbours * 8)
-    atk_neighbour_dice_normalized = atk_neighbour_dice / (atk_neighbours * 8)
+    deff_neighbour_dice_normalized = 0 if deff_neighbours == 0 else deff_neighbour_dice / (deff_neighbours * 8)
+    atk_neighbour_dice_normalized = 0 if atk_neighbours == 0 else atk_neighbour_dice / (atk_neighbours * 8)
 
     atk_win = battle_stat["atk"]["pwr"] > battle_stat["def"]["pwr"]
     atk_held = atk_win and next_turn_board.get_area_by_name(deff).owner_name == atk_area.owner_name
-
-    pass
+    return atk_probability, hold_probability, deff_dice_normalized, atk_dice_normalized, deff_neighbour_dice_normalized, atk_neighbour_dice_normalized, atk_win, atk_held
 
 
 def probability_of_successful_attack_server(board: Board, atk_area, target_area):
@@ -92,21 +94,36 @@ def probability_of_holding_area_server(board: Board, area_name, area_dice, playe
     return probability
 
 
-if __name__ == '__main__':
-    battles = np.load("train_data/battles.npy", allow_pickle=True)
-    transfers = np.load("train_data/transfers.npy", allow_pickle=True)
-    board = np.load("train_data/board.npy", allow_pickle=True)
+def get_battle_features_for_player_from_game(game, player_filter):
+    features = []
 
+    battles = game["battles"]
+    board = game["board"]
     for i in range(len(battles)):
         player = board[i]["player"]
-
+        if player != player_filter:
+            continue
         y = 1
-        while i+y < len(board) and player != board[i + y]["player"]:
+        while i + y < len(board) and player != board[i + y]["player"]:
             y += 1
 
         next_turn_board = board[i + y - 1]
-
         turn = battles[i]
         for battle in turn:
-            get_battle_features(battle, next_turn_board["board"])
-    pass
+            features.append(extract_features_from_battle(battle, next_turn_board["board"]))
+    return features
+
+
+def get_player_features_from_games():
+    features = []
+    games = list(np.load(ServerRecord.GAMES_FILE, allow_pickle=True))
+    players = list(np.load("train_data/game_player.npy"))
+    for game, player in zip(games, players):
+        features.append(get_battle_features_for_player_from_game(game, player))
+
+    return features
+
+
+if __name__ == '__main__':
+    features = get_player_features_from_games()
+    print(features)

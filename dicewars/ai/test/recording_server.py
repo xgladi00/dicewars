@@ -1,4 +1,5 @@
 from copy import deepcopy
+from os.path import isfile
 
 from dicewars.server.area import Area
 from dicewars.server.game import Game
@@ -6,17 +7,26 @@ import numpy as np
 
 
 class ServerRecord(Game):
+    GAMES_FILE = "train_data/games.npy"
+
     def __init__(self, board, area_ownership, players, game_config, addr, port, nicknames_order):
+        super().__init__(board, area_ownership, players, game_config, addr, port, nicknames_order)
+
         self.battle_record = [[]]
         self.transfer_record = [[]]
         self.board_state = []
 
-        super().__init__(board, area_ownership, players, game_config, addr, port, nicknames_order)
-
     def export_data(self):
-        np.save("train_data/battles.npy", self.battle_record)
-        np.save("train_data/transfers.npy", self.transfer_record)
-        np.save("train_data/board.npy", self.board_state)
+        games = []
+        if isfile(self.GAMES_FILE):
+            games = list(np.load(ServerRecord.GAMES_FILE, allow_pickle=True))
+
+        games.append({
+            "battles": self.battle_record,
+            "transfers": self.transfer_record,
+            "board": self.board_state
+        })
+        np.save(self.GAMES_FILE, games)
 
     def handle_player_turn(self):
         """
