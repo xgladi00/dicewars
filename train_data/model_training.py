@@ -23,7 +23,7 @@ def get_model(input_layer_size: int, hidden_layer_size: int, output_layer_size: 
 
     if isfile(MODEL_PATH):
         print("Loading existing model from: {}".format(MODEL_PATH))
-        model = torch.load(MODEL_PATH)
+        model = torch.load(MODEL_PATH, map_location=torch.device(DEVICE))
     else:
         print("New model created")
 
@@ -31,8 +31,8 @@ def get_model(input_layer_size: int, hidden_layer_size: int, output_layer_size: 
 
 
 MODEL_PATH = "train_data/model.pt"
-# DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-DEVICE = "cpu"
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+# DEVICE = "cpu"
 
 def train():
     battle_features = td.get_player_features_from_games()
