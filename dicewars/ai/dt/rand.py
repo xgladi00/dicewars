@@ -1,5 +1,8 @@
 import logging
+from os.path import isfile
 from random import shuffle
+
+import numpy as np
 
 from ..utils import possible_attacks
 
@@ -20,6 +23,7 @@ class AI:
         """
         self.player_name = player_name
         self.logger = logging.getLogger('AI')
+        self.append_name()
 
     def ai_turn(self, board, nb_moves_this_turn, nb_transfers_this_turn, nb_turns_this_game, time_left):
         """AI agent's turn
@@ -34,3 +38,10 @@ class AI:
 
         self.logger.debug("No more possible turns.")
         return EndTurnCommand()
+
+    def append_name(self):
+        game_player = []
+        if isfile("train_data/game_player.npy"):
+            game_player = list(np.load("train_data/game_player.npy"))
+        game_player.append(self.player_name)
+        np.save("train_data/game_player.npy", game_player)

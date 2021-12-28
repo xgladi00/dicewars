@@ -27,9 +27,9 @@ def extract_features_from_battle(battle, next_turn_board: Board):
     atk_neighbours = len([area for area in atk_area.get_adjacent_areas() if area.owner_name == atk_area.owner_name])
     atk_neighbour_dice = sum(
         [area.dice for area in atk_area.get_adjacent_areas() if area.owner_name == atk_area.owner_name])
-    deff_neighbours = len([area for area in deff_area.get_adjacent_areas() if area.owner_name == deff_area.owner_name])
+    deff_neighbours = len([area for area in deff_area.get_adjacent_areas() if area.owner_name != atk_area.owner_name])
     deff_neighbour_dice = sum(
-        [area.dice for area in deff_area.get_adjacent_areas() if area.owner_name == deff_area.owner_name])
+        [area.dice for area in deff_area.get_adjacent_areas() if area.owner_name != atk_area.owner_name])
 
     atk_probability = probability_of_successful_attack_server(board_before, atk, deff)
     hold_probability = probability_of_holding_area_server(board_before, atk, atk_area.dice - 1, atk_area.owner_name)
@@ -38,9 +38,24 @@ def extract_features_from_battle(battle, next_turn_board: Board):
     deff_neighbour_dice_normalized = 0 if deff_neighbours == 0 else deff_neighbour_dice / (deff_neighbours * 8)
     atk_neighbour_dice_normalized = 0 if atk_neighbours == 0 else atk_neighbour_dice / (atk_neighbours * 8)
 
+    atk_target_after_attack_hold_prob = probability_of_holding_area_server(board_before, deff, atk_area.dice - 1,
+                                                                           atk_area.owner_name)
+    atk_source_after_attack_hold_prob = probability_of_holding_area_server(board_before, deff, 1, atk_area.owner_name)
+
     atk_win = battle_stat["atk"]["pwr"] > battle_stat["def"]["pwr"]
-    atk_held = atk_win and next_turn_board.get_area_by_name(deff).owner_name == atk_area.owner_name
-    return atk_probability, hold_probability, deff_dice_normalized, atk_dice_normalized, deff_neighbour_dice_normalized, atk_neighbour_dice_normalized, atk_win, atk_held
+    atk_held = next_turn_board.get_area_by_name(atk).owner_name == atk_area.owner_name
+    return (atk_probability,
+            hold_probability,
+            deff_dice_normalized,
+            atk_dice_normalized,
+            deff_neighbour_dice_normalized,
+            deff_neighbours,
+            atk_neighbour_dice_normalized,
+            atk_neighbours,
+            atk_target_after_attack_hold_prob,
+            atk_source_after_attack_hold_prob,
+            atk_win,
+            atk_held)
 
 
 def probability_of_successful_attack_server(board: Board, atk_area, target_area):
