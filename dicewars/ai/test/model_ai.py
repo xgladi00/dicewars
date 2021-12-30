@@ -12,6 +12,8 @@ from dicewars.client.ai_driver import BattleCommand, EndTurnCommand, TransferCom
 from dicewars.ai.utils import possible_attacks, probability_of_successful_attack, probability_of_holding_area
 import torch
 from train_data.model_training import MODEL_PATH
+from dicewars.ai.kb.move_selection import get_transfer_from_endangered
+from dicewars.ai.kb.move_selection import get_transfer_to_border
 
 
 class AI:
@@ -22,12 +24,12 @@ class AI:
         self.player_name = player_name
         self.logger = logging.getLogger('NN_AI')
         self.logger.info(player_name)
-        self.model = torch.load(MODEL_PATH)
+        self.model = torch.load(MODEL_PATH, map_location=torch.device('cpu'))
         self.model.eval()
         self.append_name()
         self.ATTACK_THRESHOLD = 0.4
         self.HOLD_THRESHOLD = 0.3
-        # self.DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+        #self.DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
         self.DEVICE = "cpu"
 
     def ai_turn(self,
@@ -38,13 +40,33 @@ class AI:
                 time_left: float
                 ):
 
+        if nb_transfers_this_turn + 2 < self.max_transfers:
+            transfer = (board, self.player_name)
+            if transfer:
+                return TransferCommand(transfer[0], transfer[1])
+        else:
+            self.logger.debug(f'Already did {nb_transfers_this_turn}/{self.max_transfers} transfers, reserving 2 for evac, skipping further aggresive ones')
+
         attacks = list(possible_attacks(board, self.player_name))
         for attack, defend in attacks:
             features = torch.tensor(self.get_features(board, attack, defend), dtype=torch.float).to(self.DEVICE)
             attack_success, area_hold = self.model(features)
             # print("Attack success: ", attack_success)
-            if attack_success > self.ATTACK_THRESHOLD: # and area_hold > self.HOLD_THRESHOLD:  # and area_hold > self.HOLD_THRESHOLD:
+            mine = attack.get_dice()
+            his = defend.get_dice()
+            #if attack_success > self.ATTACK_THRESHOLD: # and area_hold > self.HOLD_THRESHOLD:  # and area_hold > self.HOLD_THRESHOLD:
+            if (mine > his) or (mine == 8):
+                self.logger.debug(f'Attacking becasue {mine}  >  {his}')
                 return BattleCommand(attack.name, defend.name)
+
+        if nb_transfers_this_turn < self.max_transfers:
+            transfer = get_transfer_from_endangered(board, self.player_name)
+            if transfer:
+                return TransferCommand(transfer[0], transfer[1])
+        else:
+            self.logger.debug(f'Already did {nb_transfers_this_turn}/{self.max_transfers} transfers, skipping further')
+
+        self.logger.debug(f'Ending turn attacks: {attacks}')        
         return EndTurnCommand()
 
     def get_features(self, board: Board, attack: Area, defend: Area):
