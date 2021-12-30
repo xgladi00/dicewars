@@ -48,31 +48,31 @@ class AI:
         return EndTurnCommand()
 
     def get_features(self, board: Board, attack: Area, defend: Area):
-        atk_dice = attack.dice
-        deff_dice = defend.dice
+        atk_dice = attack.get_dice()
+        deff_dice = defend.get_dice()
         atk_neighbours = len([area for area in [board.get_area(name) for name in attack.get_adjacent_areas_names()] if
-                              area.owner_name == attack.owner_name])
+                              area.get_owner_name() == attack.get_name()])
         atk_neighbour_dice = sum(
-            [area.dice for area in [board.get_area(name) for name in attack.get_adjacent_areas_names()] if
-             area.owner_name == attack.owner_name])
+            [area.get_dice() for area in [board.get_area(name) for name in attack.get_adjacent_areas_names()] if
+             area.get_owner_name() == attack.get_owner_name()]) ## fuj area.dice -> area.get_dice() ?
         deff_neighbours = len(
             [area for area in [board.get_area(name) for name in defend.get_adjacent_areas_names()] if
-             area.owner_name == defend.owner_name])
+             area.get_owner_name() == defend.get_owner_name()]) 
         deff_neighbour_dice = sum(
-            [area.dice for area in [board.get_area(name) for name in defend.get_adjacent_areas_names()] if
-             area.owner_name == defend.owner_name])
+            [area.get_dice() for area in [board.get_area(name) for name in defend.get_adjacent_areas_names()] if
+             area.get_owner_name() == defend.get_owner_name()])
 
-        atk_probability = probability_of_successful_attack(board, attack.name, defend.name)
-        hold_probability = probability_of_holding_area(board, attack.name, attack.dice - 1, attack.owner_name)
+        atk_probability = probability_of_successful_attack(board, attack.get_name(), defend.get_name())
+        hold_probability = probability_of_holding_area(board, attack.get_name(), attack.get_dice() - 1, attack.get_owner_name())
         deff_dice_normalized = deff_dice / 8
         atk_dice_normalized = atk_dice / 8
         deff_neighbour_dice_normalized = 0 if deff_neighbours == 0 else deff_neighbour_dice / (deff_neighbours * 8)
         atk_neighbour_dice_normalized = 0 if atk_neighbours == 0 else atk_neighbour_dice / (atk_neighbours * 8)
 
-        atk_target_after_attack_hold_prob = probability_of_holding_area(board, defend.name, attack.dice - 1,
-                                                                        attack.owner_name)
-        atk_source_after_attack_hold_prob = probability_of_holding_area(board, defend.name, 1,
-                                                                        attack.owner_name)
+        atk_target_after_attack_hold_prob = probability_of_holding_area(board, defend.get_name(), attack.get_dice() - 1,
+                                                                        attack.get_owner_name())
+        atk_source_after_attack_hold_prob = probability_of_holding_area(board, defend.get_name(), 1,
+                                                                        attack.get_owner_name())
 
         return (atk_probability,
                 hold_probability,
