@@ -8,6 +8,7 @@ import configparser
 
 import importlib
 
+from dicewars.ai.test.recording_driver import RecordingDriver
 from dicewars.client.game.game import Game
 from dicewars.client import ui
 from dicewars.client.ai_driver import AIDriver
@@ -51,6 +52,7 @@ def main():
     game = Game(args.address, args.port, hello_msg)
 
     if args.ai:
+        # ai = RecordingDriver(game, get_ai_constructor(args.ai), ai_driver_config)
         ai = AIDriver(game, get_ai_constructor(args.ai), ai_driver_config)
         ai.run()
     else:

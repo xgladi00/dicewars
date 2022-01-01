@@ -1,11 +1,19 @@
+from typing import List
+
 import numpy as np
 
 import dicewars
 import dicewars.ai.utils as utils
+from dicewars.ai.test.recording_driver import RecordingDriver
 from dicewars.ai.test.recording_server import ServerRecord
+from dicewars.ai.test.utils import extract_features_from_board
 from dicewars.server.area import Area
 
 from dicewars.server.board import Board
+from dicewars.client.game.board import Board as ClientBoard
+
+BOARD_SIZE = 35
+MAX_DICE = 8
 
 
 def extract_features_from_battle(battle, next_turn_board: Board):
@@ -57,6 +65,23 @@ def extract_features_from_battle(battle, next_turn_board: Board):
             atk_win,
             atk_held)
 
+
+def get_features_from_games():
+    server_games = list(np.load(ServerRecord.GAMES_FILE, allow_pickle=True))
+    client_games = list(np.load(RecordingDriver.BOARD_FILE, allow_pickle=True))
+
+    games = []
+    for s_game, c_game in zip(server_games, client_games):
+        game = {
+            "won": won(c_game),
+            "board_states": []
+        }
+        for board in c_game["board"]:
+            game["board_states"].append(extract_features_from_board(board, c_game["our_ai"], s_game["players"]))
+
+        games.append(game)
+
+    return games
 
 def probability_of_successful_attack_server(board: Board, atk_area, target_area):
     """Calculate probability of attack success
@@ -139,6 +164,10 @@ def get_player_features_from_games():
     return features
 
 
+def won(client_game) -> bool:
+    return client_game["our_ai"] == client_game["winner"]
+
+
 if __name__ == '__main__':
-    features = get_player_features_from_games()
-    print(features)
+    features = get_features_from_games()
+    pass

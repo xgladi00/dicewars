@@ -1,9 +1,9 @@
 from copy import deepcopy
 from os.path import isfile
 
-from dicewars.server.area import Area
-from dicewars.server.game import Game
 import numpy as np
+
+from dicewars.server.game import Game
 
 
 class ServerRecord(Game):
@@ -22,6 +22,7 @@ class ServerRecord(Game):
             games = list(np.load(ServerRecord.GAMES_FILE, allow_pickle=True))
 
         games.append({
+            "players": self.players_order,
             "battles": self.battle_record,
             "transfers": self.transfer_record,
             "board": self.board_state

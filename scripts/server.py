@@ -169,7 +169,8 @@ def main():
     assign_dice(board_config, board, args.number_of_players, area_ownership)
 
     random.seed(args.fixed)
-    game = ServerRecord(board, area_ownership, args.number_of_players, game_config, args.address, args.port, args.order)
+    game = Game(board, area_ownership, args.number_of_players, game_config, args.address, args.port, args.order)
+    # game = ServerRecord(board, area_ownership, args.number_of_players, game_config, args.address, args.port, args.order)
     game.run()
 
 
