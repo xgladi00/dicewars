@@ -3,7 +3,7 @@ import copy
 
 import torch
 
-from dicewars.ai.test.utils import extract_features_from_board
+from dicewars.ai.test.utils import extract_features_from_board, fast_board_copy
 from dicewars.ai.utils import possible_attacks, probability_of_successful_attack
 
 from dicewars.client.ai_driver import BattleCommand, EndTurnCommand, TransferCommand
@@ -37,7 +37,8 @@ class AI:
         Get a random area. If it has a possible move, the agent will do it.
         If there are no more moves, the agent ends its turn.
         """
-        self.logger.info(time_left)
+        if time_left < 1:
+            self.logger.warning("TIME IS RUNNING OUT")
 
         transfer = None
         if nb_transfers_this_turn + 2 < self.max_transfers:
@@ -118,7 +119,7 @@ class AI:
                                                      defender.get_name()) >= 0.5 or attacker.get_dice() == defender.get_dice()) and attacker.get_dice() != 1:
                     guteAttacks.append((attacker, defender))
                     guteAttacksTuples.append(
-                        self.mixmanM(copy.deepcopy(board), attacker.get_name(), defender.get_name(), 0))
+                        self.mixmanM(fast_board_copy(board), attacker.get_name(), defender.get_name(), 0))
                 else:
                     pass
                     # self.logger.debug("no nice atk")
@@ -249,7 +250,7 @@ class AI:
                         #     "mixmanM: " + str(attacker.get_name()) + " " + str(defender.get_name()) + " " + str(
                         #         zarazkaBro))
                         guteAttacksTuples.append(
-                            self.mixmanM(copy.deepcopy(board), attacker.get_name(), defender.get_name(), zarazkaBro))
+                            self.mixmanM(fast_board_copy(board), attacker.get_name(), defender.get_name(), zarazkaBro))
                 if guteAttacks:
                     for attack in guteAttacksTuples:
                         # self.logger.debug("uhmm: " + str(attack))

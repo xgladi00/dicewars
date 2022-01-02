@@ -80,3 +80,22 @@ def get_neighbouring_players(board: Board, player: int):
                 neighbouring_players.append(neighbour_area.get_owner_name())
 
     return neighbouring_players
+
+
+def fast_board_copy(board: Board):
+    areas = {}
+    board_dict = {}
+    for name, area in board.areas.items():
+        areas[name] = {
+            "adjacent_areas": area.get_adjacent_areas_names(),
+            "owner": area.get_owner_name(),
+            "dice": area.get_dice()
+        }
+        board_dict[name] = {
+            "hexes": area.hexes,
+            "neighbours": area.get_adjacent_areas_names()
+        }
+
+    return Board(areas, board_dict)
+
+
