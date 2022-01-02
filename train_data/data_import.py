@@ -1,7 +1,7 @@
 import numpy as np
 
-from dicewars.ai.xgalba03.recording_driver import RecordingDriver
-from dicewars.ai.xgalba03.recording_server import ServerRecord
+from train_data.recording_driver import RecordingDriver
+from train_data.recording_server import ServerRecord
 from dicewars.ai.xgalba03.utils import extract_features_from_board
 
 BOARD_SIZE = 35
@@ -32,4 +32,5 @@ def won(client_game) -> bool:
 
 if __name__ == '__main__':
     features = get_features_from_games()
+    print(features)
     pass

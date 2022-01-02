@@ -8,10 +8,10 @@ import configparser
 
 import importlib
 
-from dicewars.ai.xgalba03.recording_driver import RecordingDriver
 from dicewars.client.game.game import Game
 from dicewars.client import ui
 from dicewars.client.ai_driver import AIDriver
+from train_data.recording_driver import RecordingDriver
 
 from utils import get_logging_level, get_nickname
 
@@ -52,8 +52,8 @@ def main():
     game = Game(args.address, args.port, hello_msg)
 
     if args.ai:
-        # ai = RecordingDriver(game, get_ai_constructor(args.ai), ai_driver_config)
-        ai = AIDriver(game, get_ai_constructor(args.ai), ai_driver_config)
+        ai = RecordingDriver(game, get_ai_constructor(args.ai), ai_driver_config)
+        # ai = AIDriver(game, get_ai_constructor(args.ai), ai_driver_config)
         ai.run()
     else:
         app = QApplication(sys.argv)

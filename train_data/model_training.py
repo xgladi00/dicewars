@@ -7,8 +7,8 @@ import torch
 import torch.nn as nn
 
 import train_data.data_import as td
-from dicewars.ai.xgalba03.recording_driver import RecordingDriver
-from dicewars.ai.xgalba03.recording_server import ServerRecord
+from train_data.recording_driver import RecordingDriver
+from train_data.recording_server import ServerRecord
 
 MODEL_PATH = "train_data/model.pt"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"

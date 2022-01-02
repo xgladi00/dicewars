@@ -4,10 +4,10 @@ import sys
 from argparse import ArgumentParser
 from datetime import datetime
 from os.path import isfile
-from signal import signal, SIGCHLD, SIGALRM, alarm
+from signal import signal, SIGCHLD
 
-from dicewars.ai.xgalba03.recording_driver import RecordingDriver
-from dicewars.ai.xgalba03.recording_server import ServerRecord
+from train_data.recording_driver import RecordingDriver
+from train_data.recording_server import ServerRecord
 from scripts.utils import BoardDefinition, run_ai_only_game
 from train_data.model_training import train
 
