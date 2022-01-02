@@ -16,9 +16,10 @@ from dicewars.ai.test.recording_server import ServerRecord
 MODEL_PATH = "train_data/model.pt"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-game_results = []
+
 WIN_RATE_WINDOW_SIZE = 20
-win_rate_rolling_window = [0] * WIN_RATE_WINDOW_SIZE
+game_results = [0] * WIN_RATE_WINDOW_SIZE
+win_rate_rolling_window = []
 
 
 def get_model(input_layer_size: int, hidden_layer_size: int, output_layer_size: int):
