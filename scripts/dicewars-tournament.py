@@ -21,7 +21,7 @@ parser.add_argument('-n', '--nb-boards', help="How many boards should be played"
 parser.add_argument('-g', '--game-size', help="How many players should play a game", type=int, required=True)
 parser.add_argument('-s', '--seed', help="Seed sampling players for a game", type=int)
 parser.add_argument('-l', '--logdir', help="Folder to store last running logs in.")
-parser.add_argument('--ai-under-test', help="Only play this AI against others")
+parser.add_argument('--ai-under-xgalba03', help="Only play this AI against others")
 parser.add_argument('-d', '--debug', action='store_true')
 parser.add_argument('-r', '--report', help="State the game number on the stdout", action='store_true')
 parser.add_argument('--save', help="Where to put pickled GameSummaries")
@@ -47,7 +47,7 @@ PLAYING_AIs = [
     'dt.stei',
     # 'dt.wpm_d',
     # 'dt.wpm_s',
-    'test.xlogin00',
+    'xgalba03',
     'dt.wpm_c',
     'kb.sdc_post_at',
     'kb.sdc_post_dt',

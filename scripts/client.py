@@ -8,7 +8,7 @@ import configparser
 
 import importlib
 
-from dicewars.ai.test.recording_driver import RecordingDriver
+from dicewars.ai.xgalba03.recording_driver import RecordingDriver
 from dicewars.client.game.game import Game
 from dicewars.client import ui
 from dicewars.client.ai_driver import AIDriver

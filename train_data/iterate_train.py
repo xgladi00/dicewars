@@ -6,8 +6,8 @@ from datetime import datetime
 from os.path import isfile
 from signal import signal, SIGCHLD, SIGALRM, alarm
 
-from dicewars.ai.test.recording_driver import RecordingDriver
-from dicewars.ai.test.recording_server import ServerRecord
+from dicewars.ai.xgalba03.recording_driver import RecordingDriver
+from dicewars.ai.xgalba03.recording_server import ServerRecord
 from scripts.utils import BoardDefinition, run_ai_only_game
 from train_data.model_training import train
 
@@ -77,7 +77,7 @@ ai_list = [
     "kb.xlogin00"
 ]
 
-training = "test.xlogin00"
+training = "xgalba03"
 iteration_file = "logs/iteration.txt"
 
 if __name__ == "__main__":
@@ -95,6 +95,7 @@ if __name__ == "__main__":
             while ai_list[index] in ai:
                 index = random.randint(0, len(ai_list) - 1)
             ai.append(ai_list[index])
+        random.shuffle(ai)
 
         if args.report:
             print(20 * "=" + " game: {} iteration: {} ".format(i, iteration) + 20 * "=")

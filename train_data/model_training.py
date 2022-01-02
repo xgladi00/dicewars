@@ -1,17 +1,14 @@
 import os
+from collections import OrderedDict
 from os.path import isfile
 
-import numpy as np
 import matplotlib.pyplot as plt
-import torch.nn as nn
 import torch
+import torch.nn as nn
+
 import train_data.data_import as td
-from collections import OrderedDict
-
-from torch.optim import SGD
-
-from dicewars.ai.test.recording_driver import RecordingDriver
-from dicewars.ai.test.recording_server import ServerRecord
+from dicewars.ai.xgalba03.recording_driver import RecordingDriver
+from dicewars.ai.xgalba03.recording_server import ServerRecord
 
 MODEL_PATH = "train_data/model.pt"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -62,9 +59,9 @@ def train():
     for game in battle_features:
         target_features = torch.tensor([game["won"]], dtype=torch.float).to(DEVICE)
         # add win rate from last 10 games to chart and show it
-        add_game_result(game["won"], game_results)
-        plt.plot(win_rate_rolling_window)
-        plt.show()
+        # add_game_result(game["won"], game_results)
+        # plt.plot(win_rate_rolling_window)
+        # plt.show()
 
         loss_game = []
         for features in game["board_states"]:

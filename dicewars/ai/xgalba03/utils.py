@@ -4,7 +4,7 @@ BOARD_SIZE = 35
 MAX_DICE = 8
 
 
-def extract_features_from_board(board: Board, player: int, player_list: list[int]):
+def extract_features_from_board(board: Board, player: int, player_list):
     border = board.get_player_border(player)
     border_count = len(border) / BOARD_SIZE
     border_dice = 0 if (len(border) * MAX_DICE) == 0 else sum([area.get_dice() for area in border]) / (
@@ -43,7 +43,7 @@ def extract_features_from_board(board: Board, player: int, player_list: list[int
     )
 
 
-def get_player_border_enemy_side(board: Board, current_player: int, player_list: list[int]):
+def get_player_border_enemy_side(board: Board, current_player: int, player_list):
     neighbour_areas = []
 
     for player in player_list:
@@ -60,7 +60,7 @@ def get_player_border_enemy_side(board: Board, current_player: int, player_list:
     return neighbour_areas
 
 
-def get_enemy_area(board: Board, current_player: int, player_list: list[int]):
+def get_enemy_area(board: Board, current_player: int, player_list):
     area = []
     for player in player_list:
         if player == current_player:

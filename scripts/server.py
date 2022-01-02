@@ -7,7 +7,7 @@ import random
 
 from itertools import cycle
 
-from dicewars.ai.test.recording_server import ServerRecord
+from dicewars.ai.xgalba03.recording_server import ServerRecord
 from dicewars.server.board import Board
 from dicewars.server.generator import BoardGenerator
 from dicewars.server.game import Game

@@ -3,10 +3,11 @@ from os.path import isfile
 
 import numpy as np
 
-import dicewars.ai.test.xlogin00
+import dicewars.ai.xgalba03.xgalba03
 from dicewars.client.ai_driver import AIDriver, EndTurnCommand
 
-AI_CLASS = dicewars.ai.test.xlogin00.AI
+AI_CLASS = dicewars.ai.xgalba03.xgalba03.AI
+
 
 class RecordingDriver(AIDriver):
     BOARD_FILE = "train_data/board.npy"
